@@ -28,6 +28,8 @@ RUN \
 #############################################################################
 # - Install 'curl' package to download composer
 # - Temporarily disable 'drupal-recommended.ini' to enable 'allow_url_fopen'
+# - Add fix for Php7.2 drush issue https://github.com/drush-ops/drush/issues/3226
+#   (Replace Console_Table-1.1.5 withh Console_Table-1.3.1)
 RUN \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive \
@@ -54,5 +56,11 @@ RUN \
   rm -vrf /root/.drush && \
   ln -vs /usr/local/src/drush/drush /usr/bin/drush && \
   ln -vs /usr/local/src/drush/drush.complete.sh /etc/bash_completion.d/ && \
+  curl --fail --location --silent --show-error --output Console_Table-1.3.1.tgz \
+      http://download.pear.php.net/package/Console_Table-1.3.1.tgz \
+  && \
+  tar vxzf Console_Table-1.3.1.tgz && \
+  mv -v Console_Table-1.3.1 /usr/local/src/drush/lib/Console_Table-1.1.5 && \
+  rm -v Console_Table-1.3.1.tgz && \
   drush --verbose version
 #############################################################################
